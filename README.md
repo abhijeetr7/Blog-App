@@ -37,3 +37,8 @@ Smart sorting - Trending uses likes → views → date as tie-breakers
 Search persistence - Maintains search when switching sort modes
 Form validation - Required fields with user feedback
 Error handling - Graceful localStorage and data handling
+
+
+
+---
+Built with ❤️ using HTML, CSS and Javascript
