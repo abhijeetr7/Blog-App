@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog CMS</title>
+    <style>
+        /* General styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2563eb;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 0.5rem;
+        }
+
+        /* Form styles */
+        .post-form-section {
+            border: 1px solid #d1d5db;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input[type="text"], textarea, input[type="url"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+
+        .btn-danger {
+            background-color: #dc2626;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #b91c1c;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        /* Table styles */
+        .post-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .post-table th, .post-table td {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .post-table th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            color: #4b5563;
+        }
+        
+        .post-table tr:hover {
+            background-color: #f3f4f6;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .post-table, .post-table tbody, .post-table tr, .post-table td {
+                display: block;
+                width: 100%;
+            }
+
+            .post-table thead {
+                display: none;
+            }
+
+            .post-table tr {
+                margin-bottom: 1rem;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+            }
+
+            .post-table td {
+                text-align: right;
+                position: relative;
+                padding-left: 50%;
+            }
+
+            .post-table td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 0;
+                width: 50%;
+                padding-left: 1rem;
+                font-weight: 600;
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Blog Content Management</h1>
+        </header>
+        
+        <main>
+            <!-- Post Form Section -->
+            <section class="post-form-section">
+                <h2 id="form-title">Create New Post</h2>
+                <form id="post-form">
+                    <input type="hidden" id="post-id">
+                    <div class="form-group">
+                        <label for="post-title">Title</label>
+                        <input type="text" id="post-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="post-author">Author</label>
+                        <input type="text" id="post-author" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="post-thumbnail">Thumbnail Image URL</label>
+                        <input type="url" id="post-thumbnail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="post-summary">Summary</label>
+                        <textarea id="post-summary" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="post-content">Content (HTML allowed)</label>
+                        <textarea id="post-content" required></textarea>
+                    </div>
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary" id="submit-btn">Publish Post</button>
+                        <button type="button" class="btn btn-secondary" id="cancel-btn">Cancel</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Post List Section -->
+            <section>
+                <h2>Published Posts</h2>
+                <table class="post-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="post-list-body">
+                        <!-- Posts will be rendered here -->
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Global state and configuration
+        const STATE_KEYS = {
+            POSTS: 'blog.posts'
+        };
+
+        // Utility functions
+        function getState(key) {
+            try {
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : null;
+            } catch (e) {
+                console.error('Error reading from localStorage:', e);
+                return null;
+            }
+        }
+
+        function setState(key, value) {
+            try {
+                localStorage.setItem(key, JSON.stringify(value));
+            } catch (e) {
+                console.error('Error writing to localStorage:', e);
+            }
+        }
+        
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        // Initialize mock data if it doesn't exist
+        function initializeMockData() {
+            if (getState(STATE_KEYS.POSTS)) return;
+
+            const mockPosts = [
+                {
+                    id: 'post1',
+                    title: 'Getting Started with Modern Web Development',
+                    author: 'Sarah Johnson',
+                    summary: 'Learn the essential tools and techniques for building modern web applications with HTML5, CSS3, and JavaScript ES6+.',
+                    content: `<h2>Introduction</h2>
+                    <p>Modern web development has evolved significantly over the past few years. With new frameworks, tools, and best practices emerging constantly, it's important to stay up-to-date with the latest trends.</p>
+                    <h2>Key Technologies</h2>
+                    <ul>
+                        <li>HTML5 for semantic markup</li>
+                        <li>CSS3 for styling and animations</li>
+                        <li>JavaScript ES6+ for interactivity</li>
+                        <li>Responsive design principles</li>
+                    </ul>
+                    <p>By mastering these fundamentals, you'll be well-equipped to tackle any web development project.</p>
+                    <img src="https://picsum.photos/seed/webdev/600/300" alt="Web development setup">`,
+                    thumbnail: 'https://picsum.photos/seed/post1/640/360',
+                    createdAt: '2024-01-15T10:00:00Z',
+                    updatedAt: '2024-01-15T10:00:00Z',
+                    views: 1250,
+                    likes: 89
+                },
+                {
+                    id: 'post2',
+                    title: 'The Future of Artificial Intelligence',
+                    author: 'Dr. Michael Chen',
+                    summary: 'Exploring the latest developments in AI technology and their potential impact on society, business, and daily life.',
+                    content: `<h2>AI Revolution</h2>
+                    <p>Artificial Intelligence is transforming every aspect of our lives. From healthcare to transportation, AI is making processes more efficient and opening up new possibilities.</p>
+                    <h2>Current Applications</h2>
+                    <p>Today's AI applications include:</p>
+                    <ul>
+                        <li>Natural language processing</li>
+                        <li>Computer vision</li>
+                        <li>Predictive analytics</li>
+                        <li>Autonomous systems</li>
+                    </ul>
+                    <p>The potential for AI to solve complex problems is immense, but we must also consider the ethical implications.</p>`,
+                    thumbnail: 'https://picsum.photos/seed/post2/640/360',
+                    createdAt: '2024-02-10T14:30:00Z',
+                    updatedAt: '2024-02-12T09:15:00Z',
+                    views: 2180,
+                    likes: 156
+                },
+                {
+                    id: 'post3',
+                    title: 'Sustainable Living: Small Changes, Big Impact',
+                    author: 'Emma Rodriguez',
+                    summary: 'Discover practical tips for reducing your environmental footprint and living more sustainably without major lifestyle changes.',
+                    content: `<h2>Why Sustainability Matters</h2>
+                    <p>Climate change is one of the most pressing issues of our time. Every individual action, no matter how small, contributes to the larger solution.</p>
+                    <h2>Easy Changes You Can Make</h2>
+                    <ul>
+                        <li>Reduce single-use plastics</li>
+                        <li>Choose energy-efficient appliances</li>
+                        <li>Use public transportation or bike</li>
+                        <li>Support local and organic food</li>
+                    </ul>
+                    <p>These simple changes can significantly reduce your carbon footprint while often saving you money.</p>
+                    <img src="https://picsum.photos/seed/sustainability/600/300" alt="Sustainable living practices">`,
+                    thumbnail: 'https://picsum.photos/seed/post3/640/360',
+                    createdAt: '2024-02-20T11:45:00Z',
+                    updatedAt: '2024-02-20T11:45:00Z',
+                    views: 890,
+                    likes: 67
+                }
+            ];
+            setState(STATE_KEYS.POSTS, mockPosts);
+        }
+
+        // DOM elements
+        const postForm = document.getElementById('post-form');
+        const postIdInput = document.getElementById('post-id');
+        const formTitle = document.getElementById('form-title');
+        const submitBtn = document.getElementById('submit-btn');
+        const postListBody = document.getElementById('post-list-body');
+        const cancelBtn = document.getElementById('cancel-btn');
+
+        // CRUD Functions
+        function getPosts() {
+            return getState(STATE_KEYS.POSTS) || [];
+        }
+
+        function savePost(postData) {
+            let posts = getPosts();
+            if (postData.id) {
+                // Update existing post
+                const index = posts.findIndex(p => p.id === postData.id);
+                if (index !== -1) {
+                    posts[index] = { ...posts[index], ...postData, updatedAt: new Date().toISOString() };
+                }
+            } else {
+                // Create new post
+                const newPost = {
+                    ...postData,
+                    id: generateId(),
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    views: 0,
+                    likes: 0
+                };
+                posts.push(newPost);
+            }
+            setState(STATE_KEYS.POSTS, posts);
+        }
+
+        function deletePost(postId) {
+            const posts = getPosts().filter(p => p.id !== postId);
+            setState(STATE_KEYS.POSTS, posts);
+        }
+
+        // UI Functions
+        function renderPostList() {
+            const posts = getPosts();
+            postListBody.innerHTML = ''; // Clear existing list
+            
+            if (posts.length === 0) {
+                postListBody.innerHTML = '<tr><td colspan="3">No posts have been created yet.</td></tr>';
+            }
+
+            posts.forEach(post => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td data-label="Title">${post.title}</td>
+                    <td data-label="Author">${post.author}</td>
+                    <td data-label="Actions">
+                        <div class="action-buttons">
+                            <button class="btn btn-secondary" onclick="editPost('${post.id}')">Edit</button>
+                            <button class="btn btn-danger" onclick="confirmDelete('${post.id}', '${post.title}')">Delete</button>
+                        </div>
+                    </td>
+                `;
+                postListBody.appendChild(row);
+            });
+        }
+
+        function resetForm() {
+            postForm.reset();
+            postIdInput.value = '';
+            formTitle.textContent = 'Create New Post';
+            submitBtn.textContent = 'Publish Post';
+        }
+
+        window.editPost = function(postId) {
+            const post = getPosts().find(p => p.id === postId);
+            if (post) {
+                postIdInput.value = post.id;
+                document.getElementById('post-title').value = post.title;
+                document.getElementById('post-author').value = post.author;
+                document.getElementById('post-thumbnail').value = post.thumbnail;
+                document.getElementById('post-summary').value = post.summary;
+                document.getElementById('post-content').value = post.content;
+                formTitle.textContent = `Editing: ${post.title}`;
+                submitBtn.textContent = 'Update Post';
+            }
+        };
+
+        window.confirmDelete = function(postId, postTitle) {
+            // A simple confirmation message, as alert() is not supported in this environment
+            const confirmation = window.prompt(`Type "DELETE" to confirm deletion of "${postTitle}"`);
+            if (confirmation === 'DELETE') {
+                deletePost(postId);
+                renderPostList();
+            }
+        };
+
+        // Event Listeners
+        postForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const postData = {
+                id: postIdInput.value,
+                title: document.getElementById('post-title').value,
+                author: document.getElementById('post-author').value,
+                thumbnail: document.getElementById('post-thumbnail').value,
+                summary: document.getElementById('post-summary').value,
+                content: document.getElementById('post-content').value,
+            };
+            savePost(postData);
+            resetForm();
+            renderPostList();
+        });
+
+        cancelBtn.addEventListener('click', resetForm);
+
+        // Initial setup
+        window.onload = function() {
+            initializeMockData();
+            renderPostList();
+        };
+    </script>
+</body>
+</html>
