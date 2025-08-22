@@ -180,6 +180,15 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
+        .post-hero-image {
+            width: 100%;
+            height: auto;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
         .back-btn {
             display: inline-flex;
             align-items: center;
@@ -487,10 +496,10 @@
                     <button class="sort-btn active" data-sort="trending" aria-pressed="true">Trending</button>
                     <button class="sort-btn" data-sort="latest" aria-pressed="false">Latest</button>
                 </div>
-                <input 
-                    type="text" 
-                    class="search-input" 
-                    placeholder="Search posts..." 
+                <input
+                    type="text"
+                    class="search-input"
+                    placeholder="Search posts..."
                     aria-label="Search posts by title or author"
                 >
             </div>
@@ -503,7 +512,6 @@
         <div id="list-view">
             <div class="posts-grid" role="list" aria-label="Blog posts"></div>
         </div>
-
         <!-- Detail view container -->
         <div id="detail-view" class="hidden">
             <div class="post-detail">
@@ -546,7 +554,6 @@
             COMMENTS: 'blog.comments',
             USER_LIKES: 'blog.userLikes'
         };
-
         let currentSort = 'trending';
         let currentSearch = '';
         let currentPost = null;
@@ -572,8 +579,8 @@
 
         function formatDate(isoString) {
             const date = new Date(isoString);
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-                           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             return `${date.getDate().toString().padStart(2, '0')} ${months[date.getMonth()]} ${date.getFullYear()}`;
         }
 
@@ -677,13 +684,7 @@
                         <li>Take regular breaks</li>
                     </ol>
                     <p>The key is finding what works best for your personal work style and home environment.</p>
-                    <code>// Example of a productivity tracking function
-function trackTime(task) {
-    const startTime = Date.now();
-    // Perform task
-    const endTime = Date.now();
-    return endTime - startTime;
-}</code>`,
+                    <code>// Example of a productivity tracking functionfunction trackTime(task) {    const startTime = Date.now();    // Perform task    const endTime = Date.now();    return endTime - startTime;}</code>`,
                     thumbnail: 'https://picsum.photos/seed/post4/640/360',
                     createdAt: '2024-03-01T08:20:00Z',
                     updatedAt: '2024-03-03T16:30:00Z',
@@ -782,14 +783,12 @@ function trackTime(task) {
             if (!allComments[postId]) {
                 allComments[postId] = [];
             }
-            
             const newComment = {
                 id: generateId(),
                 name: comment.name,
                 text: comment.text,
                 createdAt: new Date().toISOString()
             };
-            
             allComments[postId].push(newComment);
             setState(STATE_KEYS.COMMENTS, allComments);
             return newComment;
@@ -803,17 +802,14 @@ function trackTime(task) {
             const userLikes = getUserLikes();
             const isLiked = userLikes[postId] || false;
             const newIsLiked = !isLiked;
-            
             userLikes[postId] = newIsLiked;
             setState(STATE_KEYS.USER_LIKES, userLikes);
-            
             // Update post like count
             const post = getPost(postId);
             if (post) {
                 const newLikeCount = post.likes + (newIsLiked ? 1 : -1);
                 updatePost(postId, { likes: Math.max(0, newLikeCount) });
             }
-            
             return newIsLiked;
         }
 
@@ -827,7 +823,6 @@ function trackTime(task) {
         // Sorting and filtering
         function sortPosts(posts, sortType) {
             const sorted = [...posts];
-            
             if (sortType === 'trending') {
                 return sorted.sort((a, b) => {
                     // Primary: likes descending
@@ -845,9 +840,8 @@ function trackTime(task) {
 
         function filterPosts(posts, searchQuery) {
             if (!searchQuery.trim()) return posts;
-            
             const query = searchQuery.toLowerCase();
-            return posts.filter(post => 
+            return posts.filter(post =>
                 post.title.toLowerCase().includes(query) ||
                 post.author.toLowerCase().includes(query)
             );
@@ -856,7 +850,6 @@ function trackTime(task) {
         // Rendering functions
         function renderPostCard(post) {
             const commentCount = getCommentCount(post.id);
-            
             return `
                 <div class="post-card" data-post-id="${post.id}" role="listitem" tabindex="0" aria-label="Blog post: ${post.title}">
                     <img src="${post.thumbnail}" alt="Thumbnail for ${post.title}" class="post-thumbnail" loading="lazy">
@@ -887,34 +880,55 @@ function trackTime(task) {
                 </div>
             `;
         }
-
+        
         function renderList() {
             const posts = getPosts();
             const filteredPosts = filterPosts(posts, currentSearch);
             const sortedPosts = sortPosts(filteredPosts, currentSort);
-            
+
             const postsGrid = document.querySelector('.posts-grid');
-            
+
             if (sortedPosts.length === 0) {
                 postsGrid.innerHTML = '<p>No posts found matching your search.</p>';
                 return;
             }
-            
+
             postsGrid.innerHTML = sortedPosts.map(renderPostCard).join('');
-            
+
             // Add click handlers to cards
             postsGrid.querySelectorAll('.post-card').forEach(card => {
                 const postId = card.dataset.postId;
-                
+
                 const handleClick = (e) => {
                     if (e.key && e.key !== 'Enter' && e.key !== ' ') return;
                     e.preventDefault();
                     navigate(`#/post/${postId}`);
                 };
-                
+
                 card.addEventListener('click', handleClick);
                 card.addEventListener('keydown', handleClick);
             });
+        }
+        
+        function renderComments(postId) {
+            const comments = getComments(postId);
+            const commentsList = document.querySelector('.comments-list');
+            const commentCountSpan = document.querySelector('.comment-count');
+            commentCountSpan.textContent = comments.length;
+
+            if (comments.length === 0) {
+                commentsList.innerHTML = '<p>No comments yet. Be the first to comment!</p>';
+            } else {
+                commentsList.innerHTML = comments.map(comment => `
+                    <div class="comment" role="listitem">
+                        <div class="comment-header">
+                            <span class="comment-author">${comment.name}</span>
+                            <span class="comment-date">${formatDate(comment.createdAt)}</span>
+                        </div>
+                        <p class="comment-text">${comment.text}</p>
+                    </div>
+                `).join('');
+            }
         }
 
         function renderDetail(postId) {
@@ -923,17 +937,18 @@ function trackTime(task) {
                 document.querySelector('.detail-content').innerHTML = '<p>Post not found.</p>';
                 return;
             }
-            
+
             // Increment views when post is opened
             incrementViews(postId);
             currentPost = post;
-            
+
             const userLikes = getUserLikes();
             const isLiked = userLikes[postId] || false;
-            
+
             const detailContent = document.querySelector('.detail-content');
             detailContent.innerHTML = `
                 <div class="detail-header">
+                    <img src="${post.thumbnail}" alt="Thumbnail for ${post.title}" class="post-hero-image" loading="lazy">
                     <h1 class="detail-title">${post.title}</h1>
                     <div class="detail-meta">
                         <span>By <strong>${post.author}</strong></span>
@@ -946,175 +961,108 @@ function trackTime(task) {
                     ${post.content}
                 </div>
             `;
-            
+
             // Update like button
             const likeBtn = document.querySelector('.like-btn');
             const likeCount = document.querySelector('.like-count');
             const likeText = document.querySelector('.like-text');
-            
-            likeBtn.classList.toggle('liked', isLiked);
+
+            likeBtn.dataset.postId = postId;
             likeBtn.setAttribute('aria-pressed', isLiked.toString());
+
+            if (isLiked) {
+                likeBtn.classList.add('liked');
+                likeText.textContent = 'Liked';
+            } else {
+                likeBtn.classList.remove('liked');
+                likeText.textContent = 'Like';
+            }
+
             likeCount.textContent = post.likes;
-            likeText.textContent = isLiked ? 'Liked' : 'Like';
-            
-            // Render comments
+
+            // Renders the comments section
             renderComments(postId);
         }
 
-        function renderComments(postId) {
-            const comments = getComments(postId);
-            const commentsList = document.querySelector('.comments-list');
-            const commentCount = document.querySelector('.comment-count');
-            
-            commentCount.textContent = comments.length;
-            
-            if (comments.length === 0) {
-                commentsList.innerHTML = '<p>No comments yet. Be the first to comment!</p>';
-                return;
-            }
-            
-            commentsList.innerHTML = comments.map(comment => `
-                <div class="comment" role="listitem">
-                    <div class="comment-header">
-                        <span class="comment-author">${comment.name}</span>
-                        <span class="comment-date">${formatDate(comment.createdAt)}</span>
-                    </div>
-                    <div class="comment-text">${comment.text}</div>
-                </div>
-            `).join('');
-        }
-
-        // Event handlers
-        function handleSortChange(sortType) {
-            currentSort = sortType;
-            
-            // Update button states
-            document.querySelectorAll('.sort-btn').forEach(btn => {
-                const isActive = btn.dataset.sort === sortType;
-                btn.classList.toggle('active', isActive);
-                btn.setAttribute('aria-pressed', isActive.toString());
-            });
-            
-            // Preserve search when sorting
-            const searchInput = document.querySelector('.search-input');
-            currentSearch = searchInput.value;
-            
-            renderList();
-        }
-
-        function handleSearch(searchQuery) {
-            currentSearch = searchQuery;
-            renderList();
-        }
-
-        function handleLikeToggle() {
-            if (!currentPost) return;
-            
-            const isLiked = toggleLike(currentPost.id);
-            const updatedPost = getPost(currentPost.id);
-            currentPost = updatedPost;
-            
-            // Update UI
-            const likeBtn = document.querySelector('.like-btn');
-            const likeCount = document.querySelector('.like-count');
-            const likeText = document.querySelector('.like-text');
-            const likeStatus = document.getElementById('like-status');
-            
-            likeBtn.classList.toggle('liked', isLiked);
-            likeBtn.setAttribute('aria-pressed', isLiked.toString());
-            likeCount.textContent = updatedPost.likes;
-            likeText.textContent = isLiked ? 'Liked' : 'Like';
-            
-            // Announce to screen readers
-            likeStatus.textContent = isLiked ? 'Post liked' : 'Post unliked';
-            setTimeout(() => likeStatus.textContent = '', 1000);
-        }
-
-        function handleCommentSubmit(e) {
-            e.preventDefault();
-            
-            if (!currentPost) return;
-            
-            const nameInput = document.getElementById('comment-name');
-            const textInput = document.getElementById('comment-text');
-            const commentStatus = document.getElementById('comment-status');
-            
-            const name = nameInput.value.trim();
-            const text = textInput.value.trim();
-            
-            if (!name || !text) {
-                commentStatus.textContent = 'Please fill in all required fields';
-                setTimeout(() => commentStatus.textContent = '', 3000);
-                return;
-            }
-            
-            // Add comment
-            addComment(currentPost.id, { name, text });
-            
-            // Clear form
-            nameInput.value = '';
-            textInput.value = '';
-            
-            // Re-render comments
-            renderComments(currentPost.id);
-            
-            // Announce to screen readers
-            commentStatus.textContent = 'Comment posted successfully';
-            setTimeout(() => commentStatus.textContent = '', 3000);
-        }
-
-        // Router
-        function handleRoute() {
+        function router() {
             const hash = window.location.hash;
             const listView = document.getElementById('list-view');
             const detailView = document.getElementById('detail-view');
-            
+
             if (hash.startsWith('#/post/')) {
                 const postId = hash.split('/')[2];
                 listView.classList.add('hidden');
                 detailView.classList.remove('hidden');
                 renderDetail(postId);
             } else {
-                // Default to list view
                 listView.classList.remove('hidden');
                 detailView.classList.add('hidden');
                 renderList();
             }
         }
 
-        // Initialize the application
-        function init() {
-            // Initialize mock data
+        // Event listeners
+        window.addEventListener('load', () => {
             initializeMockData();
-            
-            // Set up event listeners
-            document.querySelectorAll('.sort-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    handleSortChange(e.target.dataset.sort);
-                });
-            });
-            
-            const searchInput = document.querySelector('.search-input');
-            searchInput.addEventListener('input', (e) => {
-                handleSearch(e.target.value);
-            });
-            
-            const likeBtn = document.querySelector('.like-btn');
-            likeBtn.addEventListener('click', handleLikeToggle);
-            
-            const commentForm = document.querySelector('.comment-form');
-            commentForm.addEventListener('submit', handleCommentSubmit);
-            
-            // Router event listeners
-            window.addEventListener('hashchange', handleRoute);
-            window.addEventListener('DOMContentLoaded', handleRoute);
-            
-            // Handle initial route
-            handleRoute();
-        }
+            router();
+        });
 
-        // Start the application
-        init();
+        window.addEventListener('hashchange', router);
+
+        document.querySelector('.sort-toggle').addEventListener('click', (e) => {
+            const newSort = e.target.dataset.sort;
+            if (newSort && newSort !== currentSort) {
+                currentSort = newSort;
+                document.querySelectorAll('.sort-btn').forEach(btn => {
+                    if (btn.dataset.sort === currentSort) {
+                        btn.classList.add('active');
+                        btn.setAttribute('aria-pressed', 'true');
+                    } else {
+                        btn.classList.remove('active');
+                        btn.setAttribute('aria-pressed', 'false');
+                    }
+                });
+                renderList();
+            }
+        });
+
+        document.querySelector('.search-input').addEventListener('input', (e) => {
+            currentSearch = e.target.value;
+            renderList();
+        });
+
+        document.querySelector('.posts-grid').addEventListener('click', (e) => {
+            const card = e.target.closest('.post-card');
+            if (card) {
+                const postId = card.dataset.postId;
+                navigate(`#/post/${postId}`);
+            }
+        });
+
+        document.querySelector('.like-btn').addEventListener('click', (e) => {
+            if (currentPost) {
+                toggleLike(currentPost.id);
+                // Re-render the detail page to reflect the new like count
+                renderDetail(currentPost.id);
+            }
+        });
+
+        document.querySelector('.comment-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const nameInput = document.getElementById('comment-name');
+            const textInput = document.getElementById('comment-text');
+            if (nameInput.value.trim() && textInput.value.trim()) {
+                addComment(currentPost.id, {
+                    name: nameInput.value,
+                    text: textInput.value
+                });
+                // Clear the form
+                nameInput.value = '';
+                textInput.value = '';
+                // Re-render comments section to show the new comment
+                renderComments(currentPost.id);
+            }
+        });
     </script>
 </body>
 </html>
